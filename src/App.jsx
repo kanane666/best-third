@@ -9,12 +9,16 @@ import { useLiveData } from './hooks/useLiveData.js'
 
 export default function App() {
   const [tab, setTab] = useState('ranking')
-  const { groups, liveMatches, ranked, loading, lastUpdate, source, error, refresh } = useLiveData()
+  const {
+    groups, liveMatches, todayResults, ranked,
+    loading, lastUpdate, source, error, refresh
+  } = useLiveData()
+
+  const todayActivity = [...(liveMatches || []), ...(todayResults || [])]
 
   return (
     <div style={{ minHeight: '100dvh', background: 'var(--bg-deep)', paddingBottom: 80 }}>
 
-      {/* Header sticky */}
       <Header
         loading={loading}
         lastUpdate={lastUpdate}
@@ -22,17 +26,46 @@ export default function App() {
         onRefresh={refresh}
       />
 
-      {/* Matchs en cours (visible sur tous les tabs si des matchs sont live) */}
-      {liveMatches.length > 0 && (
-        <LiveMatchBanner matches={liveMatches} />
+      {/* Matchs du jour */}
+      {todayActivity.length > 0 && (
+        <LiveMatchBanner matches={todayActivity} />
       )}
 
-      {/* Contenu par tab */}
+      {/* Erreur réseau */}
+      {error && ranked.length === 0 && (
+        <div style={{
+          margin: '0 16px 12px',
+          padding: '12px 14px',
+          background: 'rgba(255,71,87,0.08)',
+          border: '1px solid rgba(255,71,87,0.2)',
+          borderRadius: 10,
+          fontSize: 12,
+          color: 'rgba(255,100,100,0.9)',
+          lineHeight: 1.6,
+        }}>
+          <div style={{ fontWeight: 700, marginBottom: 4 }}>⚠️ Impossible de charger les données</div>
+          <div style={{ color: 'rgba(255,255,255,0.45)', fontSize: 11 }}>
+            Vérifie ta connexion et réessaie.
+          </div>
+          <button
+            onClick={refresh}
+            style={{
+              marginTop: 8, padding: '6px 14px',
+              background: 'rgba(255,71,87,0.15)',
+              border: '1px solid rgba(255,71,87,0.3)',
+              borderRadius: 6, color: '#FF4757',
+              fontSize: 12, cursor: 'pointer',
+            }}
+          >
+            Réessayer
+          </button>
+        </div>
+      )}
+
       <main>
         {tab === 'ranking' && (
           <div key="ranking" className="animate-in">
-            {/* Hero stats */}
-            <HeroStats ranked={ranked} />
+            <HeroStats ranked={ranked} loading={loading} />
             <ThirdPlaceRanking ranked={ranked} loading={loading} />
           </div>
         )}
@@ -40,7 +73,6 @@ export default function App() {
         {tab === 'senegal' && (
           <div key="senegal" className="animate-in">
             <SenegalCard ranked={ranked} />
-            {/* Aussi afficher le classement complet pour contexte */}
             <div style={{ padding: '0 16px 8px' }}>
               <div style={{ height: 1, background: 'rgba(255,255,255,0.06)' }} />
             </div>
@@ -55,57 +87,37 @@ export default function App() {
         )}
       </main>
 
-      {/* Message d'erreur discret si fallback */}
-      {error && source === 'static' && (
-        <div style={{
-          margin: '0 16px 12px',
-          padding: '8px 12px',
-          background: 'rgba(255,209,102,0.06)',
-          border: '1px solid rgba(255,209,102,0.15)',
-          borderRadius: 8,
-          fontSize: 11,
-          color: 'rgba(255,209,102,0.7)',
-        }}>
-          ⚡ API live indisponible — données locales affichées (dernière mise à jour connue)
-        </div>
-      )}
-
-      {/* Bottom nav */}
       <BottomNav active={tab} onChange={setTab} />
     </div>
   )
 }
 
-function HeroStats({ ranked }) {
+function HeroStats({ ranked, loading }) {
+  const senIdx = ranked.findIndex(t => t.isSenegal)
+  const senRank = senIdx >= 0 ? senIdx + 1 : null
+  const senPts  = senIdx >= 0 ? ranked[senIdx].pts : 0
+  const senOk   = senRank !== null && senRank <= 8
   const qualified = ranked.filter((_, i) => i < 8).length
-  const senIdx = ranked.findIndex(t =>
-    t.isSenegal ||
-    t.name?.toLowerCase().includes('sénégal') ||
-    t.name?.toLowerCase().includes('senegal')
-  )
-  const senRank = senIdx >= 0 ? senIdx + 1 : '?'
-  const senPts = senIdx >= 0 ? ranked[senIdx].pts : 0
-  const senOk = senRank <= 8
 
   return (
-    <div style={{ padding: '8px 16px 16px', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
+    <div style={{ padding: '8px 16px 14px', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
       {[
         {
-          label: 'Places dispo',
-          value: `${8 - qualified}/8`,
-          sub: 'encore à prendre',
+          label: '🏆 Qualifiés',
+          value: loading ? '…' : `${qualified}/8`,
+          sub: 'places confirmées',
           color: '#3D9AFF',
         },
         {
           label: '🦁 Sénégal',
-          value: `#${senRank}`,
-          sub: `${senPts} point${senPts > 1 ? 's' : ''}`,
-          color: senOk ? '#00F5A0' : '#FF4757',
+          value: loading ? '…' : senRank ? `#${senRank}` : '—',
+          sub: loading ? '' : `${senPts} pt${senPts > 1 ? 's' : ''}`,
+          color: senOk ? '#00F5A0' : senRank ? '#FF4757' : 'rgba(255,255,255,0.4)',
         },
         {
-          label: 'Groupes finis',
-          value: `${ranked.filter(t => t.finished).length}/12`,
-          sub: 'groupes terminés',
+          label: '📊 Groupes',
+          value: loading ? '…' : `${ranked.filter(t => t.finished).length}/12`,
+          sub: 'terminés',
           color: '#FFD166',
         },
       ].map(s => (

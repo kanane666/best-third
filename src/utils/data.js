@@ -1,141 +1,211 @@
 // ─────────────────────────────────────────────
-// STATIC FALLBACK DATA  (updated to last known state after J2/J3 results)
-// Used when the external API is unavailable (CORS / down / rate-limited)
+// TABLE DRAPEAUX  nom anglais → emoji
+// (noms exacts retournés par openfootball/worldcup.json)
 // ─────────────────────────────────────────────
+const FLAGS = {
+  // Groupe A
+  'Mexico': '🇲🇽',
+  'South Korea': '🇰🇷',
+  'South Africa': '🇿🇦',
+  'Czech Republic': '🇨🇿',
+  // Groupe B
+  'Switzerland': '🇨🇭',
+  'Canada': '🇨🇦',
+  'Bosnia & Herzegovina': '🇧🇦',
+  'Qatar': '🇶🇦',
+  // Groupe C
+  'Brazil': '🇧🇷',
+  'Morocco': '🇲🇦',
+  'Scotland': '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
+  'Haiti': '🇭🇹',
+  // Groupe D
+  'USA': '🇺🇸',
+  'Australia': '🇦🇺',
+  'Paraguay': '🇵🇾',
+  'Turkey': '🇹🇷',
+  // Groupe E
+  'Germany': '🇩🇪',
+  'Ivory Coast': '🇨🇮',
+  'Ecuador': '🇪🇨',
+  'Curaçao': '🇨🇼',
+  // Groupe F
+  'Netherlands': '🇳🇱',
+  'Japan': '🇯🇵',
+  'Sweden': '🇸🇪',
+  'Tunisia': '🇹🇳',
+  // Groupe G
+  'Egypt': '🇪🇬',
+  'Iran': '🇮🇷',
+  'Belgium': '🇧🇪',
+  'New Zealand': '🇳🇿',
+  // Groupe H
+  'Spain': '🇪🇸',
+  'Uruguay': '🇺🇾',
+  'Cape Verde': '🇨🇻',
+  'Saudi Arabia': '🇸🇦',
+  // Groupe I
+  'France': '🇫🇷',
+  'Norway': '🇳🇴',
+  'Senegal': '🇸🇳',
+  'Iraq': '🇮🇶',
+  // Groupe J
+  'Argentina': '🇦🇷',
+  'Austria': '🇦🇹',
+  'Algeria': '🇩🇿',
+  'Jordan': '🇯🇴',
+  // Groupe K
+  'Colombia': '🇨🇴',
+  'Portugal': '🇵🇹',
+  'DR Congo': '🇨🇩',
+  'Uzbekistan': '🇺🇿',
+  // Groupe L
+  'England': '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+  'Ghana': '🇬🇭',
+  'Croatia': '🇭🇷',
+  'Panama': '🇵🇦',
+}
 
-export const STATIC_GROUPS = {
-  A: {
-    name: "Groupe A",
-    teams: [
-      { name: "Mexique",       flag: "🇲🇽", played: 3, won: 3, drawn: 0, lost: 0, gf: 6, ga: 1, pts: 9 },
-      { name: "Corée du Sud",  flag: "🇰🇷", played: 3, won: 1, drawn: 0, lost: 2, gf: 2, ga: 3, pts: 3 },
-      { name: "Afrique du Sud",flag: "🇿🇦", played: 3, won: 1, drawn: 0, lost: 2, gf: 2, ga: 4, pts: 3 },
-      { name: "Tchéquie",      flag: "🇨🇿", played: 3, won: 0, drawn: 0, lost: 3, gf: 1, ga: 3, pts: 0 },
-    ]
-  },
-  B: {
-    name: "Groupe B",
-    teams: [
-      { name: "Suisse",            flag: "🇨🇭", played: 3, won: 2, drawn: 1, lost: 0, gf: 5, ga: 2, pts: 7 },
-      { name: "Qatar",             flag: "🇶🇦", played: 3, won: 1, drawn: 1, lost: 1, gf: 3, ga: 3, pts: 4 },
-      { name: "Bosnie-Herzégovine",flag: "🇧🇦", played: 3, won: 1, drawn: 1, lost: 1, gf: 5, ga: 6, pts: 4 },
-      { name: "Cameroun",          flag: "🇨🇲", played: 3, won: 0, drawn: 1, lost: 2, gf: 2, ga: 4, pts: 1 },
-    ]
-  },
-  C: {
-    name: "Groupe C",
-    teams: [
-      { name: "Maroc",    flag: "🇲🇦", played: 3, won: 2, drawn: 1, lost: 0, gf: 5, ga: 1, pts: 7 },
-      { name: "Brésil",  flag: "🇧🇷", played: 3, won: 2, drawn: 0, lost: 1, gf: 7, ga: 3, pts: 6 },
-      { name: "Écosse",  flag: "🏴󠁧󠁢󠁳󠁣󠁴󠁿", played: 3, won: 1, drawn: 0, lost: 2, gf: 1, ga: 4, pts: 3 },
-      { name: "Haïti",   flag: "🇭🇹", played: 3, won: 0, drawn: 1, lost: 2, gf: 1, ga: 6, pts: 1 },
-    ]
-  },
-  D: {
-    name: "Groupe D",
-    teams: [
-      { name: "États-Unis", flag: "🇺🇸", played: 3, won: 2, drawn: 1, lost: 0, gf: 5, ga: 2, pts: 7 },
-      { name: "Australie",  flag: "🇦🇺", played: 3, won: 1, drawn: 1, lost: 1, gf: 4, ga: 3, pts: 4 },
-      { name: "Paraguay",   flag: "🇵🇾", played: 3, won: 1, drawn: 1, lost: 1, gf: 2, ga: 4, pts: 4 },
-      { name: "Turquie",    flag: "🇹🇷", played: 3, won: 0, drawn: 1, lost: 2, gf: 1, ga: 3, pts: 1 },
-    ]
-  },
-  E: {
-    name: "Groupe E",
-    teams: [
-      { name: "Allemagne",  flag: "🇩🇪", played: 3, won: 2, drawn: 1, lost: 0, gf: 8, ga: 2, pts: 7 },
-      { name: "Côte d\'Ivoire",flag:"🇨🇮", played: 3, won: 2, drawn: 0, lost: 1, gf: 5, ga: 3, pts: 6 },
-      { name: "Équateur",   flag: "🇪🇨", played: 3, won: 1, drawn: 1, lost: 1, gf: 2, ga: 2, pts: 4 },
-      { name: "Curaçao",    flag: "🇨🇼", played: 3, won: 0, drawn: 0, lost: 3, gf: 0, ga: 8, pts: 0 },
-    ]
-  },
-  F: {
-    name: "Groupe F",
-    teams: [
-      { name: "Pays-Bas", flag: "🇳🇱", played: 3, won: 3, drawn: 0, lost: 0, gf: 9, ga: 2, pts: 9 },
-      { name: "Japon",    flag: "🇯🇵", played: 3, won: 1, drawn: 1, lost: 1, gf: 4, ga: 5, pts: 4 },
-      { name: "Suède",    flag: "🇸🇪", played: 3, won: 1, drawn: 1, lost: 1, gf: 7, ga: 7, pts: 4 },
-      { name: "Tunisie",  flag: "🇹🇳", played: 3, won: 0, drawn: 0, lost: 3, gf: 1, ga: 7, pts: 0 },
-    ]
-  },
-  G: {
-    name: "Groupe G",
-    teams: [
-      { name: "Égypte",       flag: "🇪🇬", played: 2, won: 1, drawn: 1, lost: 0, gf: 3, ga: 1, pts: 4 },
-      { name: "Iran",         flag: "🇮🇷", played: 2, won: 1, drawn: 1, lost: 0, gf: 2, ga: 1, pts: 4 },
-      { name: "Belgique",     flag: "🇧🇪", played: 2, won: 0, drawn: 2, lost: 0, gf: 1, ga: 1, pts: 2 },
-      { name: "Nouvelle-Zélande",flag:"🇳🇿", played: 2, won: 0, drawn: 0, lost: 2, gf: 0, ga: 3, pts: 0 },
-    ]
-  },
-  H: {
-    name: "Groupe H",
-    teams: [
-      { name: "Uruguay",      flag: "🇺🇾", played: 2, won: 1, drawn: 1, lost: 0, gf: 3, ga: 1, pts: 4 },
-      { name: "Espagne",      flag: "🇪🇸", played: 2, won: 1, drawn: 1, lost: 0, gf: 4, ga: 2, pts: 4 },
-      { name: "Cap-Vert",     flag: "🇨🇻", played: 2, won: 0, drawn: 2, lost: 0, gf: 2, ga: 2, pts: 2 },
-      { name: "Arabie Saoudite",flag:"🇸🇦", played: 2, won: 0, drawn: 0, lost: 2, gf: 1, ga: 5, pts: 0 },
-    ]
-  },
-  I: {
-    name: "Groupe I",
-    teams: [
-      { name: "France",   flag: "🇫🇷", played: 3, won: 2, drawn: 0, lost: 1, gf: 6, ga: 2, pts: 6 },
-      { name: "Norvège",  flag: "🇳🇴", played: 3, won: 2, drawn: 0, lost: 1, gf: 8, ga: 3, pts: 6 },
-      { name: "Sénégal",  flag: "🇸🇳", played: 3, won: 1, drawn: 0, lost: 2, gf: 4, ga: 7, pts: 3, isSenegal: true },
-      { name: "Irak",     flag: "🇮🇶", played: 3, won: 0, drawn: 0, lost: 3, gf: 0, ga: 9, pts: 0 },
-    ]
-  },
-  J: {
-    name: "Groupe J",
-    teams: [
-      { name: "Argentine", flag: "🇦🇷", played: 2, won: 2, drawn: 0, lost: 0, gf: 6, ga: 1, pts: 6 },
-      { name: "Autriche",  flag: "🇦🇹", played: 2, won: 1, drawn: 0, lost: 1, gf: 3, ga: 3, pts: 3 },
-      { name: "Algérie",   flag: "🇩🇿", played: 2, won: 1, drawn: 0, lost: 1, gf: 2, ga: 4, pts: 3 },
-      { name: "Jordanie",  flag: "🇯🇴", played: 2, won: 0, drawn: 0, lost: 2, gf: 1, ga: 4, pts: 0 },
-    ]
-  },
-  K: {
-    name: "Groupe K",
-    teams: [
-      { name: "Colombie",     flag: "🇨🇴", played: 2, won: 2, drawn: 0, lost: 0, gf: 4, ga: 0, pts: 6 },
-      { name: "Portugal",     flag: "🇵🇹", played: 2, won: 1, drawn: 0, lost: 1, gf: 3, ga: 2, pts: 3 },
-      { name: "RD Congo",     flag: "🇨🇩", played: 2, won: 0, drawn: 1, lost: 1, gf: 1, ga: 2, pts: 1 },
-      { name: "Ouzbékistan",  flag: "🇺🇿", played: 2, won: 0, drawn: 1, lost: 1, gf: 0, ga: 4, pts: 1 },
-    ]
-  },
-  L: {
-    name: "Groupe L",
-    teams: [
-      { name: "Angleterre", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", played: 2, won: 2, drawn: 0, lost: 0, gf: 5, ga: 1, pts: 6 },
-      { name: "Ghana",      flag: "🇬🇭", played: 2, won: 1, drawn: 0, lost: 1, gf: 4, ga: 4, pts: 3 },
-      { name: "Croatie",    flag: "🇭🇷", played: 2, won: 1, drawn: 0, lost: 1, gf: 3, ga: 4, pts: 3 },
-      { name: "Panama",     flag: "🇵🇦", played: 2, won: 0, drawn: 0, lost: 2, gf: 0, ga: 3, pts: 0 },
-    ]
-  }
+// Noms FR pour l'affichage
+const NAMES_FR = {
+  'Mexico': 'Mexique',
+  'South Korea': 'Corée du Sud',
+  'South Africa': 'Afrique du Sud',
+  'Czech Republic': 'Tchéquie',
+  'Switzerland': 'Suisse',
+  'Canada': 'Canada',
+  'Bosnia & Herzegovina': 'Bosnie-Herzégovine',
+  'Qatar': 'Qatar',
+  'Brazil': 'Brésil',
+  'Morocco': 'Maroc',
+  'Scotland': 'Écosse',
+  'Haiti': 'Haïti',
+  'USA': 'États-Unis',
+  'Australia': 'Australie',
+  'Paraguay': 'Paraguay',
+  'Turkey': 'Turquie',
+  'Germany': 'Allemagne',
+  'Ivory Coast': "Côte d'Ivoire",
+  'Ecuador': 'Équateur',
+  'Curaçao': 'Curaçao',
+  'Netherlands': 'Pays-Bas',
+  'Japan': 'Japon',
+  'Sweden': 'Suède',
+  'Tunisia': 'Tunisie',
+  'Egypt': 'Égypte',
+  'Iran': 'Iran',
+  'Belgium': 'Belgique',
+  'New Zealand': 'Nouvelle-Zélande',
+  'Spain': 'Espagne',
+  'Uruguay': 'Uruguay',
+  'Cape Verde': 'Cap-Vert',
+  'Saudi Arabia': 'Arabie Saoudite',
+  'France': 'France',
+  'Norway': 'Norvège',
+  'Senegal': 'Sénégal',
+  'Iraq': 'Irak',
+  'Argentina': 'Argentine',
+  'Austria': 'Autriche',
+  'Algeria': 'Algérie',
+  'Jordan': 'Jordanie',
+  'Colombia': 'Colombie',
+  'Portugal': 'Portugal',
+  'DR Congo': 'RD Congo',
+  'Uzbekistan': 'Ouzbékistan',
+  'England': 'Angleterre',
+  'Ghana': 'Ghana',
+  'Croatia': 'Croatie',
+  'Panama': 'Panama',
+}
+
+export function getFlag(nameEn) {
+  return FLAGS[nameEn] || '🏳️'
+}
+
+export function getNameFr(nameEn) {
+  return NAMES_FR[nameEn] || nameEn
 }
 
 // ─────────────────────────────────────────────
-// EXTRAIRE LE 3e DE CHAQUE GROUPE
+// CALCULER LES CLASSEMENTS depuis les matchs bruts
 // ─────────────────────────────────────────────
+export function computeGroupsFromMatches(matches) {
+  const groups = {}
+
+  for (const m of matches) {
+    const g = m.group
+    if (!g || !g.startsWith('Group ')) continue
+    const letter = g.replace('Group ', '')
+    if (!groups[letter]) groups[letter] = {}
+
+    const score = m.score?.ft
+    if (score == null) continue // match pas encore joué
+
+    const t1 = m.team1
+    const t2 = m.team2
+    const s1 = score[0]
+    const s2 = score[1]
+
+    if (!groups[letter][t1]) groups[letter][t1] = { played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, pts: 0 }
+    if (!groups[letter][t2]) groups[letter][t2] = { played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, pts: 0 }
+
+    groups[letter][t1].played++
+    groups[letter][t2].played++
+    groups[letter][t1].gf += s1
+    groups[letter][t1].ga += s2
+    groups[letter][t2].gf += s2
+    groups[letter][t2].ga += s1
+
+    if (s1 > s2) {
+      groups[letter][t1].won++; groups[letter][t1].pts += 3
+      groups[letter][t2].lost++
+    } else if (s2 > s1) {
+      groups[letter][t2].won++; groups[letter][t2].pts += 3
+      groups[letter][t1].lost++
+    } else {
+      groups[letter][t1].drawn++; groups[letter][t1].pts++
+      groups[letter][t2].drawn++; groups[letter][t2].pts++
+    }
+  }
+
+  // Convertir en format utilisable avec drapeaux et noms FR
+  const result = {}
+  for (const [letter, teamsObj] of Object.entries(groups)) {
+    const teams = Object.entries(teamsObj).map(([nameEn, stats]) => ({
+      nameEn,
+      name: getNameFr(nameEn),
+      flag: getFlag(nameEn),
+      isSenegal: nameEn === 'Senegal',
+      ...stats,
+    }))
+    result[letter] = { name: `Groupe ${letter}`, teams }
+  }
+  return result
+}
+
+// ─────────────────────────────────────────────
+// EXTRAIRE LE 3e DE CHAQUE GROUPE (classé selon critères FIFA)
+// ─────────────────────────────────────────────
+function sortTeams(teams) {
+  return [...teams].sort((a, b) => {
+    if (b.pts !== a.pts) return b.pts - a.pts
+    const gdB = b.gf - b.ga, gdA = a.gf - a.ga
+    if (gdB !== gdA) return gdB - gdA
+    return b.gf - a.gf
+  })
+}
+
 export function getThirdPlaceTeams(groups) {
   const thirds = []
   for (const [groupKey, group] of Object.entries(groups)) {
-    const sorted = [...group.teams].sort((a, b) => {
-      const ptsDiff = b.pts - a.pts
-      if (ptsDiff !== 0) return ptsDiff
-      const dbA = a.gf - a.ga
-      const dbB = b.gf - b.ga
-      const dbDiff = dbB - dbA
-      if (dbDiff !== 0) return dbDiff
-      return b.gf - a.gf
-    })
+    const sorted = sortTeams(group.teams)
     const third = sorted[2]
     if (third) {
       thirds.push({
         ...third,
         group: groupKey,
         gd: third.gf - third.ga,
-        finished: third.played >= 3
+        // Un groupe est "terminé" si tous les 4 équipes ont joué 3 matchs
+        finished: group.teams.every(t => t.played >= 3),
       })
     }
   }
@@ -143,161 +213,16 @@ export function getThirdPlaceTeams(groups) {
 }
 
 // ─────────────────────────────────────────────
-// CLASSEMENT DES MEILLEURS 3es (critères FIFA Art. 13)
+// CLASSEMENT FIFA Art.13 des 12 meilleurs 3es
 // ─────────────────────────────────────────────
 export function rankThirdPlaces(thirds) {
   return [...thirds].sort((a, b) => {
-    // 1. Points
     if (b.pts !== a.pts) return b.pts - a.pts
-    // 2. Différence de buts
-    const gdA = a.gf - a.ga
-    const gdB = b.gf - b.ga
+    const gdB = b.gf - b.ga, gdA = a.gf - a.ga
     if (gdB !== gdA) return gdB - gdA
-    // 3. Buts marqués
     if (b.gf !== a.gf) return b.gf - a.gf
-    // 4. Fair play (on ne l'a pas → tirage FIFA → on laisse l'ordre)
     return 0
   })
-}
-
-// ─────────────────────────────────────────────
-// STATUT DE QUALIFICATION
-// ─────────────────────────────────────────────
-export function getQualStatus(rank, pts, finished) {
-  if (rank <= 4) return 'qualified'    // top 4 → quasiment assurés
-  if (rank <= 8 && pts >= 4) return 'qualified'
-  if (rank <= 8 && pts >= 3) return 'onEdge'   // dans le top 8 mais fragile
-  if (rank <= 8) return 'onEdge'
-  return 'eliminated'
-}
-
-// ─────────────────────────────────────────────
-// FETCH depuis worldcup26.ir (CORS ouvert, no auth)
-// ─────────────────────────────────────────────
-export async function fetchLiveGroups() {
-  const res = await fetch('https://worldcup26.ir/get/groups', {
-    headers: { Accept: 'application/json' },
-    signal: AbortSignal.timeout(8000)
-  })
-  if (!res.ok) throw new Error(`HTTP ${res.status}`)
-  return res.json()
-}
-
-export async function fetchLiveMatches() {
-  const res = await fetch('https://worldcup26.ir/get/games', {
-    headers: { Accept: 'application/json' },
-    signal: AbortSignal.timeout(8000)
-  })
-  if (!res.ok) throw new Error(`HTTP ${res.status}`)
-  return res.json()
-}
-
-// ─────────────────────────────────────────────
-// NORMALISER la réponse de worldcup26.ir → notre format interne
-// La structure exacte peut varier selon la version de l'API
-// ─────────────────────────────────────────────
-export function normalizeApiGroups(apiData) {
-  // worldcup26.ir retourne un objet avec les groupes
-  // On essaie de mapper vers notre format STATIC_GROUPS
-  if (!apiData || typeof apiData !== 'object') return null
-
-  // Format possible: { groups: [ { name: "Group A", teams: [...] } ] }
-  // ou directement { A: { teams: [...] } }
-  let groupsArray = null
-
-  if (Array.isArray(apiData)) groupsArray = apiData
-  else if (apiData.groups && Array.isArray(apiData.groups)) groupsArray = apiData.groups
-  else if (apiData.data && Array.isArray(apiData.data)) groupsArray = apiData.data
-
-  if (!groupsArray) return null
-
-  const result = {}
-  const letters = 'ABCDEFGHIJKL'.split('')
-
-  groupsArray.forEach((grp, idx) => {
-    const key = grp.name?.replace('Group ', '').replace('Groupe ', '').trim() || letters[idx]
-    const teams = (grp.teams || grp.standings || []).map(t => ({
-      name:   t.team?.name || t.name || t.teamName || '?',
-      flag:   getFlagEmoji(t.team?.code || t.code || t.countryCode || ''),
-      played: parseInt(t.played ?? t.gamesPlayed ?? t.mp ?? 0),
-      won:    parseInt(t.won ?? t.wins ?? t.w ?? 0),
-      drawn:  parseInt(t.drawn ?? t.draws ?? t.d ?? 0),
-      lost:   parseInt(t.lost ?? t.losses ?? t.l ?? 0),
-      gf:     parseInt(t.goalsFor ?? t.gf ?? t.gf ?? 0),
-      ga:     parseInt(t.goalsAgainst ?? t.ga ?? t.gc ?? 0),
-      pts:    parseInt(t.points ?? t.pts ?? 0),
-      isSenegal: (t.team?.name || t.name || '').toLowerCase().includes('senegal') ||
-                 (t.team?.name || t.name || '').toLowerCase().includes('sénégal')
-    }))
-    if (teams.length > 0) result[key] = { name: `Groupe ${key}`, teams }
-  })
-
-  return Object.keys(result).length > 0 ? result : null
-}
-
-// ─────────────────────────────────────────────
-// NORMALISER les matchs live de l'API
-// ─────────────────────────────────────────────
-export function normalizeLiveMatches(apiData) {
-  let matches = []
-  if (Array.isArray(apiData)) matches = apiData
-  else if (apiData?.games) matches = apiData.games
-  else if (apiData?.matches) matches = apiData.matches
-  else if (apiData?.data) matches = apiData.data
-
-  return matches
-    .filter(m => {
-      const status = (m.status || m.state || '').toLowerCase()
-      return status.includes('live') || status.includes('progress') ||
-             status.includes('1h') || status.includes('2h') ||
-             status.includes('ht') || status === 'in_play'
-    })
-    .map(m => ({
-      id: m.id || m._id,
-      home: m.homeTeam?.name || m.home?.name || m.team1 || '?',
-      away: m.awayTeam?.name || m.away?.name || m.team2 || '?',
-      homeFlag: getFlagEmoji(m.homeTeam?.code || m.home?.code || ''),
-      awayFlag: getFlagEmoji(m.awayTeam?.code || m.away?.code || ''),
-      homeScore: parseInt(m.score?.home ?? m.homeScore ?? m.goals1 ?? 0),
-      awayScore: parseInt(m.score?.away ?? m.awayScore ?? m.goals2 ?? 0),
-      minute: m.minute || m.elapsed || m.time || '?',
-      group: m.group || m.stage || '',
-      status: m.status || m.state || 'LIVE'
-    }))
-}
-
-// ─────────────────────────────────────────────
-// HELPER — code ISO 2 → emoji drapeau
-// ─────────────────────────────────────────────
-export function getFlagEmoji(code) {
-  if (!code || code.length < 2) return '🏳️'
-  const FLAGS = {
-    MEX:'🇲🇽', KOR:'🇰🇷', ZAF:'🇿🇦', CZE:'🇨🇿',
-    CHE:'🇨🇭', QAT:'🇶🇦', BIH:'🇧🇦', CMR:'🇨🇲',
-    MAR:'🇲🇦', BRA:'🇧🇷', SCO:'🏴󠁧󠁢󠁳󠁣󠁴󠁿', HTI:'🇭🇹',
-    USA:'🇺🇸', AUS:'🇦🇺', PRY:'🇵🇾', TUR:'🇹🇷',
-    DEU:'🇩🇪', CIV:'🇨🇮', ECU:'🇪🇨', CUW:'🇨🇼',
-    NED:'🇳🇱', JPN:'🇯🇵', SWE:'🇸🇪', TUN:'🇹🇳',
-    EGY:'🇪🇬', IRN:'🇮🇷', BEL:'🇧🇪', NZL:'🇳🇿',
-    URY:'🇺🇾', ESP:'🇪🇸', CPV:'🇨🇻', SAU:'🇸🇦',
-    FRA:'🇫🇷', NOR:'🇳🇴', SEN:'🇸🇳', IRQ:'🇮🇶',
-    ARG:'🇦🇷', AUT:'🇦🇹', DZA:'🇩🇿', JOR:'🇯🇴',
-    COL:'🇨🇴', PRT:'🇵🇹', COD:'🇨🇩', UZB:'🇺🇿',
-    ENG:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', GHA:'🇬🇭', HRV:'🇭🇷', PAN:'🇵🇦',
-    // 2-letter codes
-    MX:'🇲🇽', KR:'🇰🇷', ZA:'🇿🇦', CZ:'🇨🇿',
-    CH:'🇨🇭', QA:'🇶🇦', BA:'🇧🇦', CM:'🇨🇲',
-    MA:'🇲🇦', BR:'🇧🇷', US:'🇺🇸', AU:'🇦🇺',
-    PY:'🇵🇾', TR:'🇹🇷', DE:'🇩🇪', CI:'🇨🇮',
-    EC:'🇪🇨', NL:'🇳🇱', JP:'🇯🇵', SE:'🇸🇪',
-    TN:'🇹🇳', EG:'🇪🇬', IR:'🇮🇷', BE:'🇧🇪',
-    NZ:'🇳🇿', UY:'🇺🇾', ES:'🇪🇸', CV:'🇨🇻',
-    SA:'🇸🇦', FR:'🇫🇷', NO:'🇳🇴', SN:'🇸🇳',
-    IQ:'🇮🇶', AR:'🇦🇷', AT:'🇦🇹', DZ:'🇩🇿',
-    JO:'🇯🇴', CO:'🇨🇴', PT:'🇵🇹', CD:'🇨🇩',
-    UZ:'🇺🇿', GH:'🇬🇭', HR:'🇭🇷', PA:'🇵🇦',
-  }
-  return FLAGS[code.toUpperCase()] || '🏳️'
 }
 
 export function formatGD(gd) {
@@ -305,6 +230,61 @@ export function formatGD(gd) {
   return `${gd}`
 }
 
-export function getLastUpdated() {
-  return new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+// ─────────────────────────────────────────────
+// FETCH openfootball — CORS ouvert, gratuit, pas d'auth
+// ─────────────────────────────────────────────
+const OPENFOOTBALL_URL =
+  'https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json'
+
+export async function fetchWorldCupData() {
+  const res = await fetch(OPENFOOTBALL_URL, {
+    signal: AbortSignal.timeout(10000),
+    headers: { Accept: 'application/json' },
+  })
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  return res.json()
+}
+
+// ─────────────────────────────────────────────
+// MATCHS EN COURS (depuis les données openfootball)
+// openfootball marque les matchs live avec score null si pas joués
+// Pour les matchs "en cours" on ne peut pas les détecter facilement
+// depuis ce JSON statique — on retourne un tableau vide
+// (le JSON raw n'a pas d'info "en cours")
+// ─────────────────────────────────────────────
+export function extractLiveMatches(matches) {
+  // openfootball ne fournit pas de statut live dans le JSON brut
+  // On retourne les matchs du jour sans score (= en cours ou à venir)
+  const today = new Date().toISOString().split('T')[0]
+  return matches
+    .filter(m => m.date === today && m.group?.startsWith('Group'))
+    .filter(m => m.score?.ft == null) // pas encore fini
+    .map(m => ({
+      home: getNameFr(m.team1),
+      away: getNameFr(m.team2),
+      homeFlag: getFlag(m.team1),
+      awayFlag: getFlag(m.team2),
+      group: m.group,
+      time: m.time,
+      status: 'Prévu',
+      homeScore: null,
+      awayScore: null,
+    }))
+}
+
+// Matchs joués aujourd'hui (avec score)
+export function extractTodayResults(matches) {
+  const today = new Date().toISOString().split('T')[0]
+  return matches
+    .filter(m => m.date === today && m.group?.startsWith('Group') && m.score?.ft != null)
+    .map(m => ({
+      home: getNameFr(m.team1),
+      away: getNameFr(m.team2),
+      homeFlag: getFlag(m.team1),
+      awayFlag: getFlag(m.team2),
+      homeScore: m.score.ft[0],
+      awayScore: m.score.ft[1],
+      group: m.group,
+      status: 'Terminé',
+    }))
 }
