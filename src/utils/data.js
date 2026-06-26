@@ -1,124 +1,138 @@
 // ─────────────────────────────────────────────
-// TABLE DRAPEAUX  nom anglais → emoji
-// (noms exacts retournés par openfootball/worldcup.json)
+// DRAPEAUX — génération depuis code pays ISO 3166-1 alpha-2
+// Technique: Regional Indicator Symbols (U+1F1E6 à U+1F1FF)
+// A=0x1F1E6, B=0x1F1E7 ... Z=0x1F1FF
+// Ex: FR → 0x1F1EB + 0x1F1F7 → 🇫🇷
+// Scotland/England = drapeaux subdivisions (tag sequences) → stockés séparément
 // ─────────────────────────────────────────────
-const FLAGS = {
-  // Groupe A
-  'Mexico': '🇲🇽',
-  'South Korea': '🇰🇷',
-  'South Africa': '🇿🇦',
-  'Czech Republic': '🇨🇿',
-  // Groupe B
-  'Switzerland': '🇨🇭',
-  'Canada': '🇨🇦',
-  'Bosnia & Herzegovina': '🇧🇦',
-  'Qatar': '🇶🇦',
-  // Groupe C
-  'Brazil': '🇧🇷',
-  'Morocco': '🇲🇦',
-  'Scotland': '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
-  'Haiti': '🇭🇹',
-  // Groupe D
-  'USA': '🇺🇸',
-  'Australia': '🇦🇺',
-  'Paraguay': '🇵🇾',
-  'Turkey': '🇹🇷',
-  // Groupe E
-  'Germany': '🇩🇪',
-  'Ivory Coast': '🇨🇮',
-  'Ecuador': '🇪🇨',
-  'Curaçao': '🇨🇼',
-  // Groupe F
-  'Netherlands': '🇳🇱',
-  'Japan': '🇯🇵',
-  'Sweden': '🇸🇪',
-  'Tunisia': '🇹🇳',
-  // Groupe G
-  'Egypt': '🇪🇬',
-  'Iran': '🇮🇷',
-  'Belgium': '🇧🇪',
-  'New Zealand': '🇳🇿',
-  // Groupe H
-  'Spain': '🇪🇸',
-  'Uruguay': '🇺🇾',
-  'Cape Verde': '🇨🇻',
-  'Saudi Arabia': '🇸🇦',
-  // Groupe I
-  'France': '🇫🇷',
-  'Norway': '🇳🇴',
-  'Senegal': '🇸🇳',
-  'Iraq': '🇮🇶',
-  // Groupe J
-  'Argentina': '🇦🇷',
-  'Austria': '🇦🇹',
-  'Algeria': '🇩🇿',
-  'Jordan': '🇯🇴',
-  // Groupe K
-  'Colombia': '🇨🇴',
-  'Portugal': '🇵🇹',
-  'DR Congo': '🇨🇩',
-  'Uzbekistan': '🇺🇿',
-  // Groupe L
-  'England': '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
-  'Ghana': '🇬🇭',
-  'Croatia': '🇭🇷',
-  'Panama': '🇵🇦',
+
+function isoToFlag(iso2) {
+  if (!iso2 || iso2.length !== 2) return '🏳'
+  const base = 0x1F1A5 // = 0x1F1E6 - 65 ('A')
+  const a = iso2.toUpperCase().charCodeAt(0)
+  const b = iso2.toUpperCase().charCodeAt(1)
+  return String.fromCodePoint(base + a, base + b)
 }
 
-// Noms FR pour l'affichage
-const NAMES_FR = {
-  'Mexico': 'Mexique',
-  'South Korea': 'Corée du Sud',
-  'South Africa': 'Afrique du Sud',
-  'Czech Republic': 'Tchéquie',
-  'Switzerland': 'Suisse',
-  'Canada': 'Canada',
-  'Bosnia & Herzegovina': 'Bosnie-Herzégovine',
-  'Qatar': 'Qatar',
-  'Brazil': 'Brésil',
-  'Morocco': 'Maroc',
-  'Scotland': 'Écosse',
-  'Haiti': 'Haïti',
-  'USA': 'États-Unis',
-  'Australia': 'Australie',
-  'Paraguay': 'Paraguay',
-  'Turkey': 'Turquie',
-  'Germany': 'Allemagne',
-  'Ivory Coast': "Côte d'Ivoire",
-  'Ecuador': 'Équateur',
-  'Curaçao': 'Curaçao',
-  'Netherlands': 'Pays-Bas',
-  'Japan': 'Japon',
-  'Sweden': 'Suède',
-  'Tunisia': 'Tunisie',
-  'Egypt': 'Égypte',
-  'Iran': 'Iran',
-  'Belgium': 'Belgique',
-  'New Zealand': 'Nouvelle-Zélande',
-  'Spain': 'Espagne',
-  'Uruguay': 'Uruguay',
-  'Cape Verde': 'Cap-Vert',
-  'Saudi Arabia': 'Arabie Saoudite',
-  'France': 'France',
-  'Norway': 'Norvège',
-  'Senegal': 'Sénégal',
-  'Iraq': 'Irak',
-  'Argentina': 'Argentine',
-  'Austria': 'Autriche',
-  'Algeria': 'Algérie',
-  'Jordan': 'Jordanie',
-  'Colombia': 'Colombie',
-  'Portugal': 'Portugal',
-  'DR Congo': 'RD Congo',
-  'Uzbekistan': 'Ouzbékistan',
-  'England': 'Angleterre',
-  'Ghana': 'Ghana',
-  'Croatia': 'Croatie',
-  'Panama': 'Panama',
+// Drapeaux subdivisions (tag sequences) — stockés via \u escapes pour éviter
+// les problèmes d'encodage dans les bundlers
+const SCOTLAND_FLAG = "\uD83C\uDFF4\uDB40\uDC67\uDB40\uDC62\uDB40\uDC73\uDB40\uDC63\uDB40\uDC74\uDB40\uDC7F"
+const ENGLAND_FLAG  = "\uD83C\uDFF4\uDB40\uDC67\uDB40\uDC62\uDB40\uDC65\uDB40\uDC6E\uDB40\uDC67\uDB40\uDC7F"
+const WALES_FLAG    = "\uD83C\uDFF4\uDB40\uDC67\uDB40\uDC62\uDB40\uDC77\uDB40\uDC6C\uDB40\uDC73\uDB40\uDC7F"
+
+// Map nom anglais → code ISO (ou flag spécial)
+const TEAM_ISO = {
+  'Mexico':                 'MX',
+  'South Korea':            'KR',
+  'South Africa':           'ZA',
+  'Czech Republic':         'CZ',
+  'Switzerland':            'CH',
+  'Canada':                 'CA',
+  'Bosnia & Herzegovina':   'BA',
+  'Qatar':                  'QA',
+  'Brazil':                 'BR',
+  'Morocco':                'MA',
+  'Scotland':               '__SCO',   // spécial
+  'Haiti':                  'HT',
+  'USA':                    'US',
+  'Australia':              'AU',
+  'Paraguay':               'PY',
+  'Turkey':                 'TR',
+  'Germany':                'DE',
+  'Ivory Coast':            'CI',
+  'Ecuador':                'EC',
+  'Curaçao':                'CW',
+  'Netherlands':            'NL',
+  'Japan':                  'JP',
+  'Sweden':                 'SE',
+  'Tunisia':                'TN',
+  'Egypt':                  'EG',
+  'Iran':                   'IR',
+  'Belgium':                'BE',
+  'New Zealand':            'NZ',
+  'Spain':                  'ES',
+  'Uruguay':                'UY',
+  'Cape Verde':             'CV',
+  'Saudi Arabia':           'SA',
+  'France':                 'FR',
+  'Norway':                 'NO',
+  'Senegal':                'SN',
+  'Iraq':                   'IQ',
+  'Argentina':              'AR',
+  'Austria':                'AT',
+  'Algeria':                'DZ',
+  'Jordan':                 'JO',
+  'Colombia':               'CO',
+  'Portugal':               'PT',
+  'DR Congo':               'CD',
+  'Uzbekistan':             'UZ',
+  'England':                '__ENG',   // spécial
+  'Ghana':                  'GH',
+  'Croatia':                'HR',
+  'Panama':                 'PA',
 }
 
 export function getFlag(nameEn) {
-  return FLAGS[nameEn] || '🏳️'
+  const iso = TEAM_ISO[nameEn]
+  if (!iso) return '🏳'
+  if (iso === '__SCO') return SCOTLAND_FLAG
+  if (iso === '__ENG') return ENGLAND_FLAG
+  if (iso === '__WAL') return WALES_FLAG
+  return isoToFlag(iso)
+}
+
+// ─────────────────────────────────────────────
+// NOMS EN FRANÇAIS
+// ─────────────────────────────────────────────
+const NAMES_FR = {
+  'Mexico':                 'Mexique',
+  'South Korea':            'Corée du Sud',
+  'South Africa':           'Afrique du Sud',
+  'Czech Republic':         'Tchéquie',
+  'Switzerland':            'Suisse',
+  'Canada':                 'Canada',
+  'Bosnia & Herzegovina':   'Bosnie-Herzégovine',
+  'Qatar':                  'Qatar',
+  'Brazil':                 'Brésil',
+  'Morocco':                'Maroc',
+  'Scotland':               'Écosse',
+  'Haiti':                  'Haïti',
+  'USA':                    'États-Unis',
+  'Australia':              'Australie',
+  'Paraguay':               'Paraguay',
+  'Turkey':                 'Turquie',
+  'Germany':                'Allemagne',
+  'Ivory Coast':            "Côte d'Ivoire",
+  'Ecuador':                'Équateur',
+  'Curaçao':                'Curaçao',
+  'Netherlands':            'Pays-Bas',
+  'Japan':                  'Japon',
+  'Sweden':                 'Suède',
+  'Tunisia':                'Tunisie',
+  'Egypt':                  'Égypte',
+  'Iran':                   'Iran',
+  'Belgium':                'Belgique',
+  'New Zealand':            'Nouvelle-Zélande',
+  'Spain':                  'Espagne',
+  'Uruguay':                'Uruguay',
+  'Cape Verde':             'Cap-Vert',
+  'Saudi Arabia':           'Arabie Saoudite',
+  'France':                 'France',
+  'Norway':                 'Norvège',
+  'Senegal':                'Sénégal',
+  'Iraq':                   'Irak',
+  'Argentina':              'Argentine',
+  'Austria':                'Autriche',
+  'Algeria':                'Algérie',
+  'Jordan':                 'Jordanie',
+  'Colombia':               'Colombie',
+  'Portugal':               'Portugal',
+  'DR Congo':               'RD Congo',
+  'Uzbekistan':             'Ouzbékistan',
+  'England':                'Angleterre',
+  'Ghana':                  'Ghana',
+  'Croatia':                'Croatie',
+  'Panama':                 'Panama',
 }
 
 export function getNameFr(nameEn) {
@@ -126,7 +140,7 @@ export function getNameFr(nameEn) {
 }
 
 // ─────────────────────────────────────────────
-// CALCULER LES CLASSEMENTS depuis les matchs bruts
+// CALCUL DES CLASSEMENTS depuis les matchs bruts
 // ─────────────────────────────────────────────
 export function computeGroupsFromMatches(matches) {
   const groups = {}
@@ -138,7 +152,7 @@ export function computeGroupsFromMatches(matches) {
     if (!groups[letter]) groups[letter] = {}
 
     const score = m.score?.ft
-    if (score == null) continue // match pas encore joué
+    if (score == null) continue
 
     const t1 = m.team1
     const t2 = m.team2
@@ -150,10 +164,8 @@ export function computeGroupsFromMatches(matches) {
 
     groups[letter][t1].played++
     groups[letter][t2].played++
-    groups[letter][t1].gf += s1
-    groups[letter][t1].ga += s2
-    groups[letter][t2].gf += s2
-    groups[letter][t2].ga += s1
+    groups[letter][t1].gf += s1; groups[letter][t1].ga += s2
+    groups[letter][t2].gf += s2; groups[letter][t2].ga += s1
 
     if (s1 > s2) {
       groups[letter][t1].won++; groups[letter][t1].pts += 3
@@ -167,13 +179,13 @@ export function computeGroupsFromMatches(matches) {
     }
   }
 
-  // Convertir en format utilisable avec drapeaux et noms FR
+  // Convertir en format affichable
   const result = {}
   for (const [letter, teamsObj] of Object.entries(groups)) {
     const teams = Object.entries(teamsObj).map(([nameEn, stats]) => ({
       nameEn,
-      name: getNameFr(nameEn),
-      flag: getFlag(nameEn),
+      name:      getNameFr(nameEn),
+      flag:      getFlag(nameEn),
       isSenegal: nameEn === 'Senegal',
       ...stats,
     }))
@@ -183,7 +195,7 @@ export function computeGroupsFromMatches(matches) {
 }
 
 // ─────────────────────────────────────────────
-// EXTRAIRE LE 3e DE CHAQUE GROUPE (classé selon critères FIFA)
+// EXTRAIRE LE 3e (trié selon critères FIFA)
 // ─────────────────────────────────────────────
 function sortTeams(teams) {
   return [...teams].sort((a, b) => {
@@ -204,7 +216,6 @@ export function getThirdPlaceTeams(groups) {
         ...third,
         group: groupKey,
         gd: third.gf - third.ga,
-        // Un groupe est "terminé" si tous les 4 équipes ont joué 3 matchs
         finished: group.teams.every(t => t.played >= 3),
       })
     }
@@ -213,7 +224,7 @@ export function getThirdPlaceTeams(groups) {
 }
 
 // ─────────────────────────────────────────────
-// CLASSEMENT FIFA Art.13 des 12 meilleurs 3es
+// CLASSEMENT FIFA Art.13
 // ─────────────────────────────────────────────
 export function rankThirdPlaces(thirds) {
   return [...thirds].sort((a, b) => {
@@ -231,7 +242,7 @@ export function formatGD(gd) {
 }
 
 // ─────────────────────────────────────────────
-// FETCH openfootball — CORS ouvert, gratuit, pas d'auth
+// FETCH openfootball — 100% gratuit, CORS ouvert, pas d'auth
 // ─────────────────────────────────────────────
 const OPENFOOTBALL_URL =
   'https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json'
@@ -246,45 +257,37 @@ export async function fetchWorldCupData() {
 }
 
 // ─────────────────────────────────────────────
-// MATCHS EN COURS (depuis les données openfootball)
-// openfootball marque les matchs live avec score null si pas joués
-// Pour les matchs "en cours" on ne peut pas les détecter facilement
-// depuis ce JSON statique — on retourne un tableau vide
-// (le JSON raw n'a pas d'info "en cours")
+// MATCHS DU JOUR
 // ─────────────────────────────────────────────
-export function extractLiveMatches(matches) {
-  // openfootball ne fournit pas de statut live dans le JSON brut
-  // On retourne les matchs du jour sans score (= en cours ou à venir)
-  const today = new Date().toISOString().split('T')[0]
-  return matches
-    .filter(m => m.date === today && m.group?.startsWith('Group'))
-    .filter(m => m.score?.ft == null) // pas encore fini
-    .map(m => ({
-      home: getNameFr(m.team1),
-      away: getNameFr(m.team2),
-      homeFlag: getFlag(m.team1),
-      awayFlag: getFlag(m.team2),
-      group: m.group,
-      time: m.time,
-      status: 'Prévu',
-      homeScore: null,
-      awayScore: null,
-    }))
-}
-
-// Matchs joués aujourd'hui (avec score)
 export function extractTodayResults(matches) {
   const today = new Date().toISOString().split('T')[0]
   return matches
     .filter(m => m.date === today && m.group?.startsWith('Group') && m.score?.ft != null)
     .map(m => ({
-      home: getNameFr(m.team1),
-      away: getNameFr(m.team2),
+      home:       getNameFr(m.team1),
+      away:       getNameFr(m.team2),
+      homeFlag:   getFlag(m.team1),
+      awayFlag:   getFlag(m.team2),
+      homeScore:  m.score.ft[0],
+      awayScore:  m.score.ft[1],
+      group:      m.group,
+      status:     'Terminé',
+    }))
+}
+
+export function extractUpcomingToday(matches) {
+  const today = new Date().toISOString().split('T')[0]
+  return matches
+    .filter(m => m.date === today && m.group?.startsWith('Group') && m.score?.ft == null)
+    .map(m => ({
+      home:     getNameFr(m.team1),
+      away:     getNameFr(m.team2),
       homeFlag: getFlag(m.team1),
       awayFlag: getFlag(m.team2),
-      homeScore: m.score.ft[0],
-      awayScore: m.score.ft[1],
-      group: m.group,
-      status: 'Terminé',
+      time:     m.time,
+      group:    m.group,
+      status:   'Prévu',
+      homeScore: null,
+      awayScore: null,
     }))
 }
